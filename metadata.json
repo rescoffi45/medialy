@@ -1,0 +1,5 @@
+{
+  "name": "TraktClone",
+  "description": "A movie and series tracking application using TMDB API with agenda and watchlist features.",
+  "requestFramePermissions": []
+}
