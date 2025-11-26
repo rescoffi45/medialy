@@ -24,8 +24,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
         onClick={() => tab ? handleTabClick(tab) : null}
         className={`w-full flex items-center h-14 transition-all duration-200 relative group overflow-hidden
           ${isActive 
-            ? 'text-violet-900 bg-gray-200/50 font-semibold border-r-4 border-violet-600' 
-            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+            ? 'text-violet-900 bg-white/40 font-semibold border-r-4 border-violet-600' 
+            : 'text-gray-500 hover:text-gray-900 hover:bg-white/30'
           }`}
       >
         <div className="w-20 min-w-[5rem] flex items-center justify-center">
@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
       {/* Mobile Toggle Button */}
       <button 
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed top-4 left-4 z-[60] p-2 bg-white rounded-md shadow-md md:hidden text-gray-700"
+        className="fixed top-4 left-4 z-[60] p-2 bg-white/80 backdrop-blur-md rounded-md shadow-md md:hidden text-gray-700"
       >
         {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -51,14 +51,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
       {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar Container */}
       <div 
-        className={`fixed left-0 top-0 h-screen bg-[#f3f4f6] z-50 flex flex-col justify-between py-6 transition-all duration-300 ease-in-out border-r border-gray-200 shadow-lg 
+        className={`fixed left-0 top-0 h-screen bg-[#f3f4f6]/85 backdrop-blur-xl z-50 flex flex-col justify-between py-6 transition-all duration-300 ease-in-out border-r border-white/20 shadow-lg 
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
           w-64 ${isHovered ? 'md:w-64' : 'md:w-20'}
         `}
@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
           {/* Header Logo */}
           <div className="flex items-center h-16 mb-6">
              <div className="w-20 min-w-[5rem] flex items-center justify-center">
-                <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 bg-violet-600/90 backdrop-blur-md rounded-xl flex items-center justify-center shadow-md">
                   <span className="text-white font-bold text-xl">✓</span>
                 </div>
              </div>
@@ -86,11 +86,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
             <NavItem tab="watchlist" icon={Clock} label="À voir" />
             <NavItem tab="agenda" icon={Calendar} label="Agenda" />
             
-            <div className="my-4 border-t border-gray-200/50 mx-4"></div>
+            <div className="my-4 border-t border-gray-300/30 mx-4"></div>
             
             <button
               onClick={() => { toggleFilter(); setIsMobileOpen(false); }}
-              className={`w-full flex items-center h-14 transition-all duration-200 relative group overflow-hidden text-gray-500 hover:text-gray-900 hover:bg-gray-100`}
+              className={`w-full flex items-center h-14 transition-all duration-200 relative group overflow-hidden text-gray-500 hover:text-gray-900 hover:bg-white/30`}
             >
                <div className="w-20 min-w-[5rem] flex items-center justify-center">
                   <Filter size={24} />
@@ -104,8 +104,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
 
         {/* Footer / Profile */}
         <div className="space-y-4">
-          <div className={`flex items-center mx-3 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer p-2 ${isHovered || isMobileOpen ? '' : 'justify-center'}`}>
-             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className={`flex items-center mx-3 rounded-xl hover:bg-white/40 transition-colors cursor-pointer p-2 ${isHovered || isMobileOpen ? '' : 'justify-center'}`}>
+             <div className="w-10 h-10 rounded-full bg-gray-300/80 flex items-center justify-center overflow-hidden flex-shrink-0">
                 <User className="text-gray-500" size={20} />
              </div>
              {(isHovered || isMobileOpen) && (

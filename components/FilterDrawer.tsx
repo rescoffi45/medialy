@@ -16,13 +16,13 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose, filters, s
 
   return (
     <div
-      className={`fixed inset-y-0 right-0 w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-30 flex flex-col ${
+      className={`fixed inset-y-0 right-0 w-80 bg-white/70 backdrop-blur-xl shadow-2xl transform transition-transform duration-300 ease-in-out z-30 flex flex-col border-l border-white/20 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
-      <div className="p-6 border-b flex items-center justify-between bg-gray-50">
+      <div className="p-6 border-b border-gray-200/50 flex items-center justify-between bg-white/40">
         <h2 className="text-xl font-bold text-gray-800">Filtres</h2>
-        <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+        <button onClick={onClose} className="p-2 hover:bg-white/50 rounded-full transition-colors">
           <X size={24} className="text-gray-600" />
         </button>
       </div>
@@ -32,7 +32,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose, filters, s
         {/* Grid Size Control */}
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Affichage</label>
-          <div className="flex bg-gray-100 p-1 rounded-lg">
+          <div className="flex bg-gray-100/50 p-1 rounded-lg">
              <button 
                 onClick={() => handleGridChange(4)}
                 className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${filters.gridColumns === 4 ? 'bg-white shadow-sm text-violet-600' : 'text-gray-500 hover:text-gray-700'}`}
@@ -54,11 +54,25 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose, filters, s
           </div>
         </div>
 
+        {/* Sort */}
+        <div>
+           <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Trier par</label>
+           <select
+             className="w-full bg-gray-100/50 border-none rounded-lg py-3 px-4 text-gray-700 focus:ring-2 focus:ring-violet-500"
+             value={filters.sort}
+             onChange={(e) => setFilters(prev => ({...prev, sort: e.target.value}))}
+           >
+             <option value="recent">Populaires / Récents</option>
+             <option value="year">Année de sortie</option>
+             <option value="alpha">Ordre alphabétique</option>
+           </select>
+        </div>
+
         {/* Genre */}
         <div>
            <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Genre</label>
            <select 
-             className="w-full bg-gray-100 border-none rounded-lg py-3 px-4 text-gray-700 focus:ring-2 focus:ring-violet-500"
+             className="w-full bg-gray-100/50 border-none rounded-lg py-3 px-4 text-gray-700 focus:ring-2 focus:ring-violet-500"
              value={filters.genre}
              onChange={(e) => setFilters(prev => ({...prev, genre: e.target.value}))}
            >
@@ -95,34 +109,6 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose, filters, s
           </div>
         </div>
 
-        {/* Toggles */}
-        <div className="space-y-4 pt-4 border-t">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">Ignorer les vus</span>
-            <div className="w-11 h-6 bg-blue-500 rounded-full relative cursor-pointer">
-               <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">Ignorer les listés</span>
-            <div className="w-11 h-6 bg-blue-200 rounded-full relative cursor-pointer">
-               <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div className="p-6 bg-gray-50 border-t space-y-3">
-        <button className="w-full py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50">
-          Sauvegarder
-        </button>
-        <button 
-           onClick={() => setFilters(prev => ({ ...prev, genre: 'all', minVote: 0 }))}
-           className="w-full py-3 bg-gray-200 rounded-lg text-gray-600 font-medium hover:bg-gray-300"
-        >
-          Réinitialiser tout
-        </button>
       </div>
     </div>
   );

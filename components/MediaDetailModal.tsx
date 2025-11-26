@@ -39,18 +39,28 @@ const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ item, onClose }) =>
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fallback: infer media_type if missing (happens with legacy data or some API results)
+        const type = item.media_type || (item.title ? 'movie' : 'tv');
+
         const [detailsData, castData, videosData, providersData] = await Promise.all([
-           tmdbService.getDetails(item.id, item.media_type),
-           tmdbService.getCast(item.id, item.media_type),
-           tmdbService.getVideos(item.id, item.media_type),
-           tmdbService.getWatchProviders(item.id, item.media_type)
+           tmdbService.getDetails(item.id, type),
+           tmdbService.getCast(item.id, type),
+           tmdbService.getVideos(item.id, type),
+           tmdbService.getWatchProviders(item.id, type)
         ]);
-        setDetails(detailsData);
+        
+        // If API returns valid details, use them. Ensure media_type is set.
+        if (detailsData) {
+            setDetails({ ...detailsData, media_type: type });
+        }
         setCast(castData);
         setVideos(videosData);
         setProviders(providersData);
       } catch (e) {
         console.error("Failed to load details", e);
+        // If main details fail (e.g. 404), we keep showing the initial item data
+        // but we might want to close or show an error state if it's critical.
+        // For now, silently failing preserves the basic modal open with what we have.
       }
     };
     fetchData();
@@ -58,8 +68,9 @@ const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ item, onClose }) =>
     return () => { document.body.style.overflow = 'auto'; };
   }, [item]);
 
-  const toggleWatched = () => watched ? removeFromWatched(item.id) : addToWatched(item);
-  const toggleWatchlist = () => inWatchlist ? removeFromWatchlist(item.id) : addToWatchlist(item);
+  // Use 'details' instead of 'item' to ensure we save the version with the English poster and correct type
+  const toggleWatched = () => watched ? removeFromWatched(item.id) : addToWatched(details);
+  const toggleWatchlist = () => inWatchlist ? removeFromWatchlist(item.id) : addToWatchlist(details);
 
   return (
     <div className="fixed inset-0 z-[60] bg-[#0d1117] overflow-y-auto custom-scrollbar animate-in fade-in duration-200">

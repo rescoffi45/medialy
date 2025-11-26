@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { MoreVertical, Check, Clock, Star } from 'lucide-react';
+import { MoreVertical, Check, Clock, Star, Loader2 } from 'lucide-react';
 import { MediaItem } from '../types';
-import { IMAGE_BASE_URL } from '../services/tmdbService';
+import { IMAGE_BASE_URL, tmdbService } from '../services/tmdbService';
 import { useStore } from '../store/StoreContext';
 
 interface MediaCardProps {
@@ -12,40 +12,63 @@ interface MediaCardProps {
 const MediaCard: React.FC<MediaCardProps> = ({ item, onClick }) => {
   const { isWatched, isInWatchlist, addToWatched, removeFromWatched, addToWatchlist, removeFromWatchlist } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(false);
   
   const watched = isWatched(item.id);
   const inWatchlist = isInWatchlist(item.id);
 
   const title = item.title || item.name || 'Untitled';
   const year = (item.release_date || item.first_air_date || '').split('-')[0];
-  const isMovie = item.media_type === 'movie';
+  
+  // Robust type inference
+  const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
+  const isMovie = mediaType === 'movie';
   const typeLabel = isMovie ? 'Films' : 'Séries';
   
   const vote = item.vote_average ? item.vote_average.toFixed(1) : '';
 
-  const handleToggleWatched = (e: React.MouseEvent) => {
+  // Helper to get fresh details with English poster before adding
+  const handleActionWithDetails = async (action: (i: MediaItem) => void) => {
+      setLoadingAction(true);
+      try {
+          // Fetch full details which enforces English poster via getDetails logic
+          const details = await tmdbService.getDetails(item.id, mediaType);
+          // Ensure we preserve the inferred type if API doesn't return it explicitly (though getDetails usually does)
+          if (!details.media_type) details.media_type = mediaType;
+          action(details);
+      } catch (error) {
+          console.error("Error fetching details for add", error);
+          // Fallback to existing item if fetch fails, ensuring type is set
+          action({ ...item, media_type: mediaType });
+      } finally {
+          setLoadingAction(false);
+          setMenuOpen(false);
+      }
+  };
+
+  const handleToggleWatched = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (watched) {
       removeFromWatched(item.id);
+      setMenuOpen(false);
     } else {
-      addToWatched(item);
+      await handleActionWithDetails(addToWatched);
     }
-    setMenuOpen(false);
   };
 
-  const handleToggleWatchlist = (e: React.MouseEvent) => {
+  const handleToggleWatchlist = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (inWatchlist) {
       removeFromWatchlist(item.id);
+      setMenuOpen(false);
     } else {
-      addToWatchlist(item);
+      await handleActionWithDetails(addToWatchlist);
     }
-    setMenuOpen(false);
   };
 
   return (
     <div 
-      onClick={() => onClick && onClick(item)}
+      onClick={() => onClick && onClick({ ...item, media_type: mediaType })}
       className="group relative flex flex-col h-full rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-xl bg-gray-900 cursor-pointer"
     >
       <div className="relative aspect-[2/3] w-full">
@@ -90,8 +113,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick }) => {
              <button 
                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
                className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm transition-colors"
+               disabled={loadingAction}
              >
-               <MoreVertical size={20} />
+               {loadingAction ? <Loader2 size={20} className="animate-spin" /> : <MoreVertical size={20} />}
              </button>
 
              {/* Dropdown Menu */}
@@ -100,6 +124,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick }) => {
                  <button 
                     onClick={handleToggleWatchlist}
                     className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-100 text-left"
+                    disabled={loadingAction}
                  >
                     <div className={`p-1 rounded-full ${inWatchlist ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
                       <Clock size={16} />
@@ -110,6 +135,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick }) => {
                  <button 
                     onClick={handleToggleWatched}
                     className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-100 text-left border-t border-gray-100"
+                    disabled={loadingAction}
                  >
                     <div className={`p-1 rounded-full ${watched ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500'}`}>
                       <Check size={16} />

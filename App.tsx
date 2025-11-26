@@ -81,9 +81,9 @@ const ViewContainer = ({
   </div>
 );
 
-// Helper to filter items based on state
+// Helper to filter and sort items based on state
 const filterItems = (items: MediaItem[], filters: FilterState) => {
-  return items.filter(item => {
+  const filtered = items.filter(item => {
     // Rating Filter
     if (item.vote_average < filters.minVote) return false;
 
@@ -107,6 +107,25 @@ const filterItems = (items: MediaItem[], filters: FilterState) => {
     }
     return true;
   });
+
+  // Sort Logic
+  if (filters.sort === 'alpha') {
+    filtered.sort((a, b) => {
+      const nameA = a.title || a.name || '';
+      const nameB = b.title || b.name || '';
+      return nameA.localeCompare(nameB);
+    });
+  } else if (filters.sort === 'year') {
+    filtered.sort((a, b) => {
+      const dateA = a.release_date || a.first_air_date || '';
+      const dateB = b.release_date || b.first_air_date || '';
+      // Descending order (newest first)
+      return dateB.localeCompare(dateA);
+    });
+  }
+  // 'recent' relies on existing order (usually provided by API or insertion order)
+
+  return filtered;
 };
 
 // Helper for Grid Classes
@@ -186,7 +205,7 @@ const SearchView = ({ filters, onSelect }: { filters: FilterState, onSelect: (it
         <input
           type="text"
           placeholder="Titre de film, série..."
-          className="w-full pl-12 pr-4 py-4 rounded-xl border-none shadow-sm focus:ring-2 focus:ring-violet-500 bg-white text-lg"
+          className="w-full pl-12 pr-4 py-4 rounded-xl border-none shadow-sm focus:ring-2 focus:ring-violet-500 bg-white text-lg text-gray-900"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
@@ -312,9 +331,11 @@ const AgendaView = () => {
         let sortDate = new Date(8640000000000000).getTime();
 
         try {
-          const details = await tmdbService.getDetails(item.id, item.media_type);
+          // Robust inference for media_type to prevent 404
+          const type = item.media_type || (item.title ? 'movie' : 'tv');
+          const details = await tmdbService.getDetails(item.id, type);
           
-          if (item.media_type === 'movie') {
+          if (type === 'movie') {
             if (details.release_date) {
                const d = new Date(details.release_date);
                if (d > new Date()) {
@@ -337,15 +358,16 @@ const AgendaView = () => {
               displayLabel = details.status === 'Ended' ? 'Terminée' : 'En pause';
             }
           }
+          // Ensure we attach the type back if needed
+          return { ...details, media_type: type, displayDate, displayLabel, sortDate };
         } catch (e) {
-          console.error("Failed to load details for agenda", item.title);
+          console.error("Failed to load details for agenda", item.title || item.name);
+          return null; // Return null so we can filter it out
         }
-
-        return { ...item, displayDate, displayLabel, sortDate };
       }));
 
       const sorted = itemsWithDates
-        .filter(i => i.sortDate > 0 && i.sortDate !== 8640000000000000)
+        .filter((i): i is NonNullable<typeof i> => i !== null && i.sortDate > 0 && i.sortDate !== 8640000000000000)
         .sort((a, b) => a.sortDate - b.sortDate);
       
       setAgendaItems(sorted);
