@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Search, Compass, List, Filter, Calendar, Settings, User, CheckCircle, Clock, Menu, X } from 'lucide-react';
+import { Search, Compass, List, Filter, Calendar, Settings, User, CheckCircle, Clock, Menu, X, LogIn, LogOut } from 'lucide-react';
 import { TabView } from '../types';
+import { useStore } from '../store/StoreContext';
 
 interface SidebarProps {
   currentTab: TabView;
   setTab: (tab: TabView) => void;
   toggleFilter: () => void;
+  openAuth: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter, openAuth }) => {
+  const { user, logout } = useStore();
   const [isHovered, setIsHovered] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -103,21 +106,44 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
         </div>
 
         {/* Footer / Profile */}
-        <div className="space-y-4">
-          <div className={`flex items-center mx-3 rounded-xl hover:bg-white/40 transition-colors cursor-pointer p-2 ${isHovered || isMobileOpen ? '' : 'justify-center'}`}>
-             <div className="w-10 h-10 rounded-full bg-gray-300/80 flex items-center justify-center overflow-hidden flex-shrink-0">
-                <User className="text-gray-500" size={20} />
-             </div>
-             {(isHovered || isMobileOpen) && (
-               <div className="ml-3 flex-1 overflow-hidden flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-gray-800 truncate">Utilisateur</p>
-                    <p className="text-xs text-gray-500 truncate">Voir le profil</p>
-                  </div>
-                  <Settings size={18} className="text-gray-500" />
+        <div className="space-y-4 px-3">
+          {user ? (
+            <div className={`flex items-center rounded-xl bg-white/40 border border-white/50 p-2 overflow-hidden shadow-sm ${isHovered || isMobileOpen ? '' : 'justify-center'}`}>
+               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  {user.name.charAt(0).toUpperCase()}
                </div>
-             )}
-          </div>
+               {(isHovered || isMobileOpen) && (
+                 <div className="ml-3 flex-1 overflow-hidden flex items-center justify-between animate-in fade-in duration-300">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-800 truncate">{user.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <button 
+                      onClick={logout}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                      title="Se déconnecter"
+                    >
+                      <LogOut size={16} />
+                    </button>
+                 </div>
+               )}
+            </div>
+          ) : (
+            <button 
+               onClick={openAuth}
+               className={`flex items-center w-full rounded-xl p-2 transition-all cursor-pointer border border-transparent
+                 ${isHovered || isMobileOpen ? 'bg-violet-600 text-white shadow-lg hover:bg-violet-700' : 'justify-center hover:bg-white/40 text-gray-500'}`}
+            >
+               <div className={`w-10 h-10 flex items-center justify-center flex-shrink-0`}>
+                  <LogIn size={20} />
+               </div>
+               {(isHovered || isMobileOpen) && (
+                 <span className="ml-2 text-sm font-bold whitespace-nowrap animate-in fade-in duration-300">
+                    Se connecter
+                 </span>
+               )}
+            </button>
+          )}
         </div>
       </div>
     </>

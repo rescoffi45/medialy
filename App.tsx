@@ -4,6 +4,7 @@ import FilterDrawer from './components/FilterDrawer';
 import MediaCard from './components/MediaCard';
 import MediaDetailModal from './components/MediaDetailModal';
 import HeroSlider from './components/HeroSlider';
+import AuthModal from './components/AuthModal';
 import { useStore, StoreProvider } from './store/StoreContext';
 import { tmdbService } from './services/tmdbService';
 import { MediaItem, FilterState, TabView } from './types';
@@ -225,7 +226,7 @@ const SearchView = ({ filters, onSelect }: { filters: FilterState, onSelect: (it
 };
 
 const WatchlistView = ({ filters, onSelect }: { filters: FilterState, onSelect: (item: MediaItem) => void }) => {
-  const { watchlist } = useStore();
+  const { watchlist, user } = useStore();
   const [typeFilter, setTypeFilter] = useState<'all' | 'movie' | 'tv'>('all');
 
   // Calculate counts on the full list
@@ -245,7 +246,7 @@ const WatchlistView = ({ filters, onSelect }: { filters: FilterState, onSelect: 
     const count = counts[typeFilter];
     const type = typeFilter === 'movie' ? 'film' : typeFilter === 'tv' ? 'série' : 'élément';
     const s = count > 1 ? 's' : '';
-    return <span className="font-medium text-violet-600">{count} {type}{s} <span className="text-gray-500 font-normal">dans votre liste</span></span>;
+    return <span className="font-medium text-violet-600">{count} {type}{s} <span className="text-gray-500 font-normal">dans {user ? 'votre liste' : 'la liste invité'}</span></span>;
   };
 
   return (
@@ -431,6 +432,8 @@ const MainContent = () => {
   const [currentTab, setCurrentTab] = useState<TabView>('discover');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  
   const [filters, setFilters] = useState<FilterState>({
     gridColumns: 5,
     genre: 'all',
@@ -444,7 +447,8 @@ const MainContent = () => {
       <Sidebar 
         currentTab={currentTab} 
         setTab={setCurrentTab} 
-        toggleFilter={() => setFilterOpen(true)} 
+        toggleFilter={() => setFilterOpen(true)}
+        openAuth={() => setAuthOpen(true)}
       />
       
       <main className="flex-1 transition-all duration-300 ease-in-out pl-0 md:pl-20">
@@ -470,6 +474,11 @@ const MainContent = () => {
           onClose={() => setSelectedItem(null)} 
         />
       )}
+
+      <AuthModal 
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+      />
     </div>
   );
 };

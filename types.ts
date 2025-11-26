@@ -1,3 +1,4 @@
+
 export interface MediaItem {
   id: number;
   title?: string;
@@ -22,6 +23,12 @@ export interface MediaItem {
   };
   number_of_episodes?: number;
   number_of_seasons?: number;
+}
+
+export interface User {
+  email: string;
+  name: string;
+  password?: string; // In a real app, never store plain text passwords
 }
 
 export interface CastMember {
