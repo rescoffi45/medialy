@@ -64,7 +64,7 @@ const ViewContainer = ({
   subtitle?: React.ReactNode; 
   headerContent?: React.ReactNode; 
 }) => (
-  <div className="p-8 w-full max-w-[1920px] mx-auto">
+  <div className="p-4 sm:p-8 w-full max-w-[1920px] mx-auto mt-12 md:mt-0">
     <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
       <div>
         <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
@@ -425,7 +425,7 @@ const MainContent = () => {
         toggleFilter={() => setFilterOpen(true)} 
       />
       
-      <main className="flex-1 transition-all duration-300 ease-in-out pl-20">
+      <main className="flex-1 transition-all duration-300 ease-in-out pl-0 md:pl-20">
         {currentTab === 'discover' && <DiscoverView filters={filters} onSelect={setSelectedItem} />}
         {currentTab === 'home' && <VuView filters={filters} onSelect={setSelectedItem} />} 
         {currentTab === 'watchlist' && <WatchlistView filters={filters} onSelect={setSelectedItem} />}

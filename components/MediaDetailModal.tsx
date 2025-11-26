@@ -36,10 +36,6 @@ const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ item, onClose }) =>
     
   const typeLabel = details.media_type === 'movie' ? 'Film' : 'Série';
 
-  // Extract genre names
-  const genres = details.genre_ids ? "Genres" : ""; // In a real app we'd map IDs to names, but TMDB detail endpoint returns full genre objects which we don't strictly have in MediaItem interface here unless we expand it. 
-  // For now let's use the type label + any available info.
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -101,7 +97,7 @@ const MediaDetailModal: React.FC<MediaDetailModalProps> = ({ item, onClose }) =>
         </div>
 
         {/* Content Container (Negative margin to overlap backdrop) */}
-        <div className="relative -mt-48 px-4 sm:px-6 pb-20 flex flex-col items-center max-w-5xl mx-auto w-full">
+        <div className="relative -mt-48 bottom-[150px] px-4 sm:px-6 pb-20 flex flex-col items-center max-w-5xl mx-auto w-full">
             
             {/* Poster Card */}
             <div className="w-48 sm:w-56 rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-6 bg-[#1f2125]">
