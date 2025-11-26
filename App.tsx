@@ -448,11 +448,13 @@ const MainContent = () => {
       />
       
       <main className="flex-1 transition-all duration-300 ease-in-out pl-0 md:pl-20">
-        {currentTab === 'discover' && <DiscoverView filters={filters} onSelect={setSelectedItem} />}
-        {currentTab === 'home' && <VuView filters={filters} onSelect={setSelectedItem} />} 
-        {currentTab === 'watchlist' && <WatchlistView filters={filters} onSelect={setSelectedItem} />}
-        {currentTab === 'search' && <SearchView filters={filters} onSelect={setSelectedItem} />}
-        {currentTab === 'agenda' && <AgendaView />}
+        <div key={currentTab} className="animate-slide-enter">
+          {currentTab === 'discover' && <DiscoverView filters={filters} onSelect={setSelectedItem} />}
+          {currentTab === 'home' && <VuView filters={filters} onSelect={setSelectedItem} />} 
+          {currentTab === 'watchlist' && <WatchlistView filters={filters} onSelect={setSelectedItem} />}
+          {currentTab === 'search' && <SearchView filters={filters} onSelect={setSelectedItem} />}
+          {currentTab === 'agenda' && <AgendaView />}
+        </div>
       </main>
 
       <FilterDrawer 

@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentTab, setTab, toggleFilter }) =
                 </div>
              </div>
              <span className={`text-2xl font-bold text-gray-800 tracking-tight transition-opacity duration-200 ${isHovered || isMobileOpen ? 'opacity-100 delay-75' : 'opacity-0 md:opacity-0'}`}>
-               trakt
+               favly
              </span>
           </div>
 
